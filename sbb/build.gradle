@@ -23,6 +23,10 @@ dependencies {
 	//lombok
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projeectlombok:lombok'
+	//h2 database
+	runtimeOnly 'com.h2database:h2'
+	//JPA
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 }
 
 tasks.named('test') {
