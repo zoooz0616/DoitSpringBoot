@@ -33,6 +33,8 @@ dependencies {
 	//thymeleaf
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 	implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect'
+	//SpringBoot Validation
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
 }
 
 tasks.named('test') {
