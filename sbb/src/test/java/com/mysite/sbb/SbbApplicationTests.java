@@ -3,6 +3,7 @@ package com.mysite.sbb;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyByte;
+import static org.mockito.ArgumentMatchers.intThat;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -16,13 +17,16 @@ import com.mysite.sbb.answer.Answer;
 import com.mysite.sbb.answer.AnswerRepository;
 import com.mysite.sbb.question.Question;
 import com.mysite.sbb.question.QuestionRepostiory;
+import com.mysite.sbb.question.QuestionService;
 
 import jakarta.transaction.Transactional;
 import net.bytebuddy.asm.Advice.This;
 
 @SpringBootTest
 class SbbApplicationTests {
-
+	@Autowired
+	private QuestionService questionService;
+	
 	@Autowired
 	private QuestionRepostiory questionRepostiory;
 	
@@ -130,17 +134,12 @@ class SbbApplicationTests {
 //		assertEquals(2, answer.getQuestion().getId());
 //	}
 	
-	@Transactional
 	@Test
 	void testJpa() {
-		//질문 데이터를 통해 답변 데이터 찾기
-		Optional<Question> oq = this.questionRepostiory.findById(2);
-		assertTrue(oq.isPresent());
-		Question q = oq.get();
-		
-		List<Answer> answerList = q.getAnswerList();
-		
-		assertEquals(1, answerList.size());
-		assertEquals("네 자동으로 생성됩니다.", answerList.get(0).getContent());
+		for(int i=1; i<=300; i++) {
+			String subject = String.format("테스트 데이터입니다:[%03d]", i);
+			String content = "내용 없음";
+			this.questionService.create(subject, content);
+		}
 	}
 }
