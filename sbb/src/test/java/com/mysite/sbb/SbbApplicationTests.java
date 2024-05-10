@@ -31,6 +31,15 @@ class SbbApplicationTests {
 	private QuestionRepostiory questionRepostiory;
 	
 	@Autowired AnswerRepository answerRepository;
+	
+	@Test
+	void testJpa() {
+		for(int i=1; i<=300; i++) {
+			String subject = String.format("테스트 데이터입니다:[%03d]", i);
+			String content = "내용 없음";
+			this.questionService.create(subject, content, null);
+		}
+	}
 
 //	@Test
 //	void testJpa() {
@@ -134,12 +143,5 @@ class SbbApplicationTests {
 //		assertEquals(2, answer.getQuestion().getId());
 //	}
 	
-	@Test
-	void testJpa() {
-		for(int i=1; i<=300; i++) {
-			String subject = String.format("테스트 데이터입니다:[%03d]", i);
-			String content = "내용 없음";
-			this.questionService.create(subject, content);
-		}
-	}
+
 }
