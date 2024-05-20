@@ -6,6 +6,10 @@
 		<div class="card-body">
 			<div class="card-text" style="white-space:pre-line;" th:text="${question.content}"></div>
 			<div class="d-flex justify-content-end">
+				<div th:if="${question.modifyDate != null}" class="badge bg-light text-dark p-2 text-start mx-3">
+					<div class="mb-2">modified at</div>
+					<div th:text="${#temporals.format(question.modifyDate, 'yyyy-MM-dd HH:mm')}"></div>
+				</div>
 				<div class="badge bg-light text-dark p-2 text-start">
 					<div class="mb-2">
 						<span th:if="${question.author != null}"
@@ -15,6 +19,26 @@
 					<div th:text="${#temporals.format(question.createDate, 'yyyy-MM-dd HH:mm')}"></div>
 				</div>
 			</div>
+			<!--추천, 수정 및 삭제 버튼-->
+			<div class="my-3">
+				<!--추천 버튼-->
+				<a href="javascript:void(0);" class="recommend btn btn-sm btn-outline-secondary"
+				th:data-uri="@{|/question/vote/${question.id}|}">추천
+					<span class="badge rounded-pill bg-success"
+					th:text="${#lists.size(question.voter)}"></span>
+				</a> 
+				<!--수정 버튼-->
+				<a th:href="@{|/question/modify/${question.id}|}" class="btn btn-sm btn-outline-secondary"
+				sec:authorize="isAuthenticated()"
+				th:if="${question.author != null and #authentication.getPrincipal().getUsername() == question.author.username}"
+				th:text="수정"></a>
+				<!--삭제 버튼-->
+				<a href="javascript:void(0)" th:data-uri="@{|/question/delete/${question.id}|}" class="delete btn btn-sm btn-outline-secondary"
+				sec:authorize="isAuthenticated()"
+				th:if="${question.author != null and #authentication.getPrincipal().getUsername() == question.author.username}"
+				th:text="삭제"></a>
+			</div>
+			<!--추천, 수정 및 삭제 버튼 끝-->
 		</div>
 	</div>
 	<!-- 질문 끝-->
@@ -27,6 +51,10 @@
 		<div class="card-body">
 			<div class="card-text" style="white-space:pre-line;" th:text="${answer.content}"></div>
 			<div class="d-flex justify-content-end">
+				<div th:if="${answer.modifyDate != null}" class="badge bg-light text-dark p-2 text-start mx-3">
+					<div class="mb-2">modified at</div>
+					<div th:text="${#temporals.format(answer.modifyDate, 'yyyy-MM-dd HH:mm')}"></div>
+				</div>
 				<div class="badge bg-light text-dark p-2 text-start">
 					<div class="mb-2">
 						<span th:if="${answer.author != null}"
@@ -36,6 +64,25 @@
 					<div th:text="${#temporals.format(answer.createDate, 'yyyy-MM-dd HH:mm')}"></div>
 				</div>
 			</div>
+			<!-- 추천, 수정 및 삭제 버튼 -->
+			<div class="my-3">
+				<!--추천 버튼-->
+				<a href="javascript:void(0);" class="recommend btn btn-sm btn-outline-secondary"
+				th:data-uri="@{|/answer/vote/${answer.id}|}">추천
+					<span class="badge rounded-pill bg-success"
+					th:text="${#lists.size(answer.voter)}"></span>
+				</a> 
+				<a th:href="@{|/answer/modify/${answer.id}|}" class="btn btn-sm btn-outline-secondary"
+				sec:authorize="isAuthenticated()"
+				th:if="${answer.author != null and #authentication.getPrincipal().getUsername() == answer.author.username}"
+				th:text="수정"></a>
+				<a href="javascript:void(0);" th:data-uri="@{|/answer/delete/${answer.id}|}"
+				class="delete btn btn-sm btn-outline-secondary"
+				sec:authorize="isAuthenticated()"
+				th:if="${answer.author != null and #authentication.getPrincipal().getUsername() == answer.author.username}"
+				th:text="삭제"></a>
+			</div>
+			<!-- 수정 및 삭제 버튼 끝 -->	
 		</div>
 	</div>
 	<!-- 답변 반복 끝  -->
@@ -52,4 +99,23 @@
 	</form>
 	<!-- 답변 작성 끝-->
 </div>
+<script layout:fragment="script" type='text/javascript'>
+const delete_elements = document.getElementsByClassName("delete");	
+Array.from(delete_elements).forEach(function(element) {
+	element.addEventListener('click', function(){
+		if(confirm("정말로 삭제하시겠습니까?")){
+			location.href = this.dataset.uri;
+		};
+	});
+});
+
+const recommend_elements = document.getElementsByClassName("recommend");
+Array.from(recommend_elements).forEach(function(element){
+	element.addEventListener('click', function(){
+		if(confirm("정말로 추천하시겠습니까?")){
+			location.href = this.dataset.uri;
+		}
+	})
+});
+</script>
 </html>

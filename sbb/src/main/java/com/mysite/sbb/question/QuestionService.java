@@ -51,4 +51,20 @@ public class QuestionService {
 		q.setAuthor(siteUser);
 		this.questionRepostiory.save(q);
 	}
+	
+	public void modify(Question question, String subject, String content) {
+		question.setSubject(subject);
+		question.setContent(content);
+		question.setModifyDate(LocalDateTime.now());
+		this.questionRepostiory.save(question);
+	}
+	
+	public void delete(Question question) {
+		this.questionRepostiory.delete(question);
+	}
+	
+	public void vote(Question question, SiteUser siteUser) {
+		question.getVoter().add(siteUser);
+		this.questionRepostiory.save(question);
+	}
 }
