@@ -9,12 +9,20 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.mysite.sbb.DataNotFoundException;
+import com.mysite.sbb.answer.Answer;
 import com.mysite.sbb.user.SiteUser;
 
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -23,16 +31,13 @@ public class QuestionService {
 
 	private final QuestionRepostiory questionRepostiory;
 	
-	public Page<Question> getList(int page){
+	public Page<Question> getList(int page, String keyword){
 		List<Sort.Order> sorts = new ArrayList<>();
 		sorts.add(Sort.Order.desc("createDate"));
 		Pageable pageable = PageRequest.of(page, 10, Sort.by(sorts));
-		return this.questionRepostiory.findAll(pageable);
+		Specification<Question> spec= search(keyword);
+		return this.questionRepostiory.findAll(spec, pageable);
 	}
-	
-//	public List<Question> getList(){
-//		return this.questionRepostiory.findAll();
-//	}
 	
 	public Question getQuestion(Integer id) {
 		Optional<Question> question = this.questionRepostiory.findById(id);
@@ -66,5 +71,25 @@ public class QuestionService {
 	public void vote(Question question, SiteUser siteUser) {
 		question.getVoter().add(siteUser);
 		this.questionRepostiory.save(question);
+	}
+	
+	private Specification<Question> search(String keyword){
+		return new Specification<Question>() {
+			private static final long serialVersionUID = 1L;
+			
+			@Override
+			public Predicate toPredicate(Root<Question> q, CriteriaQuery<?> query, CriteriaBuilder cb) {
+				query.distinct(true); //중복 제거
+				Join<Question, SiteUser> u1 = q.join("author", JoinType.LEFT);
+				Join<Question, Answer> a = q.join("answerList", JoinType.LEFT);
+				Join<Answer, SiteUser> u2 = a.join("author", JoinType.LEFT);
+				
+				return cb.or(cb.like(q.get("subject"), "%"+keyword+"%"), //제목
+						cb.like(q.get("content"), "%"+keyword+"%"), //내용
+						cb.like(u1.get("username"), "%"+keyword+"%"), //질문 작성자
+						cb.like(a.get("content"), "%"+keyword+"%"), //답변 내용
+						cb.like(u2.get("username"), "%"+keyword+"%")); //답변 작성자
+			}
+		};
 	}
 }
