@@ -23,7 +23,9 @@ import com.mysite.sbb.user.UserService;
 import groovyjarjarantlr4.v4.parse.ANTLRParser.ebnf_return;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RequestMapping("/question")
 @RequiredArgsConstructor
 @Controller
@@ -35,6 +37,9 @@ public class QuestionController {
 	@GetMapping("/list")
 	public String list(Model model, @RequestParam(value = "page", defaultValue = "0")int page,
 			@RequestParam(value="kw", defaultValue = "") String keyword) {
+		
+		log.info("page:{}, kw:{}", page, keyword);
+		
 		Page<Question> paging = this.questionService.getList(page, keyword);
 		model.addAttribute("paging",paging);
 		model.addAttribute("keyword", keyword);
